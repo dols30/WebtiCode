@@ -1,10 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import {
   BarChart,
   BookOpen,
@@ -16,9 +17,42 @@ import {
   Settings,
   User,
 } from "lucide-react"
+import { useAuth } from "@/lib/auth-context"
+import { courses } from "@/lib/courses-data"
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview")
+  const { user, isAuthenticated, logout, isLoading } = useAuth()
+  const router = useRouter()
+  
+  useEffect(() => {
+    // Redirect if not authenticated
+    if (!isLoading && !isAuthenticated) {
+      router.push("/login")
+    }
+  }, [isAuthenticated, isLoading, router])
+  
+  // Show loading state or return null while checking authentication
+  if (isLoading || !isAuthenticated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  const handleLogout = () => {
+    logout()
+    router.push("/")
+  }
+
+  // Get the user's enrolled courses
+  const userCourses = courses.filter(course => 
+    user?.enrolledCourses.includes(course.id)
+  )
 
   return (
     <div className="flex min-h-screen bg-slate-100">
@@ -71,7 +105,7 @@ export default function DashboardPage() {
           </Link>
         </nav>
         <div className="p-4 border-t border-slate-800">
-          <Button variant="ghost" className="w-full justify-start text-white">
+          <Button variant="ghost" className="w-full justify-start text-white" onClick={handleLogout}>
             <LogOut className="mr-2 h-5 w-5" />
             Logout
           </Button>
@@ -111,16 +145,18 @@ export default function DashboardPage() {
                 </Button>
                 <span className="absolute right-1 top-1 flex h-2 w-2 rounded-full bg-red-600"></span>
               </div>
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <img
-                  src="/placeholder.svg?height=32&width=32"
-                  width="32"
-                  height="32"
-                  className="rounded-full"
-                  alt="Avatar"
-                />
-                <span className="sr-only">Profile</span>
-              </Button>
+              <div className="flex items-center">
+                <Button variant="ghost" size="icon" className="rounded-full mr-2">
+                  <img
+                    src="/placeholder.svg?height=32&width=32"
+                    width="32"
+                    height="32"
+                    className="rounded-full"
+                    alt="Avatar"
+                  />
+                </Button>
+                <span className="font-medium">{user?.name}</span>
+              </div>
             </div>
           </div>
         </header>
@@ -128,8 +164,8 @@ export default function DashboardPage() {
         {/* Dashboard Content */}
         <main className="p-4 md:p-6 space-y-6">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">Dashboard</h1>
-            <Button>
+            <h1 className="text-2xl font-bold">Welcome back, {user?.name}</h1>
+            <Button onClick={() => router.push('/courses')}>
               <GraduationCap className="mr-2 h-4 w-4" />
               Enroll in a Course
             </Button>
@@ -150,8 +186,12 @@ export default function DashboardPage() {
                     <BookOpen className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">4</div>
-                    <p className="text-xs text-muted-foreground">2 in progress, 2 completed</p>
+                    <div className="text-2xl font-bold">{user?.enrolledCourses.length || 0}</div>
+                    <p className="text-xs text-muted-foreground">
+                      {user?.enrolledCourses.length 
+                        ? `${Math.floor(user.enrolledCourses.length / 2)} in progress, ${Math.ceil(user.enrolledCourses.length / 2)} completed` 
+                        : "No courses enrolled"}
+                    </p>
                   </CardContent>
                 </Card>
                 <Card>
@@ -225,54 +265,38 @@ export default function DashboardPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">HTML & CSS Fundamentals</p>
-                          <p className="text-sm text-muted-foreground">12 modules • 24 lessons</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-medium">92%</p>
-                          <div className="mt-1 h-2 w-24 rounded-full bg-slate-200">
-                            <div className="h-full w-[92%] rounded-full bg-green-600" />
+                      {userCourses.length > 0 ? (
+                        userCourses.map(course => (
+                          <div key={course.id} className="flex items-center justify-between">
+                            <div>
+                              <p className="font-medium">{course.title}</p>
+                              <p className="text-sm text-muted-foreground">{course.lessons} lessons • {course.duration}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-medium">{Math.floor(Math.random() * 50) + 50}%</p>
+                              <div className="mt-1 h-2 w-24 rounded-full bg-slate-200">
+                                <div 
+                                  className={`h-full rounded-full ${
+                                    course.level === "Beginner" 
+                                      ? "bg-green-600" 
+                                      : course.level === "Intermediate" 
+                                        ? "bg-yellow-600" 
+                                        : "bg-blue-600"
+                                  }`} 
+                                  style={{ width: `${Math.floor(Math.random() * 50) + 50}%` }}
+                                />
+                              </div>
+                            </div>
                           </div>
+                        ))
+                      ) : (
+                        <div className="text-center py-8">
+                          <p className="text-slate-500 mb-4">You haven't enrolled in any courses yet.</p>
+                          <Button onClick={() => router.push('/courses')} variant="outline">
+                            Browse Courses
+                          </Button>
                         </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">JavaScript Essentials</p>
-                          <p className="text-sm text-muted-foreground">10 modules • 32 lessons</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-medium">65%</p>
-                          <div className="mt-1 h-2 w-24 rounded-full bg-slate-200">
-                            <div className="h-full w-[65%] rounded-full bg-yellow-600" />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">React Fundamentals</p>
-                          <p className="text-sm text-muted-foreground">8 modules • 20 lessons</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-medium">45%</p>
-                          <div className="mt-1 h-2 w-24 rounded-full bg-slate-200">
-                            <div className="h-full w-[45%] rounded-full bg-blue-600" />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium">Node.js Backend Development</p>
-                          <p className="text-sm text-muted-foreground">6 modules • 18 lessons</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-medium">10%</p>
-                          <div className="mt-1 h-2 w-24 rounded-full bg-slate-200">
-                            <div className="h-full w-[10%] rounded-full bg-red-600" />
-                          </div>
-                        </div>
-                      </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

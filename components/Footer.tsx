@@ -133,12 +133,7 @@ export default function Footer() {
         <div className="border-t border-slate-700 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-slate-300 mb-4 md:mb-0">© 2025 WebtiCode. All rights reserved.</p>
-            <p className="text-slate-400 text-sm">
-              Designed with ❤️ by{" "}
-              <a href="#" className="hover:text-white">
-                WebtiCode Team
-              </a>
-            </p>
+           
           </div>
         </div>
       </div>

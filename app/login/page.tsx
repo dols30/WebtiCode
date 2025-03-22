@@ -11,9 +11,12 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Loader2 } from "lucide-react"
+import { useAuth } from "@/lib/auth-context"
+import {Loader} from "lucide-react"
 
 export default function LoginPage() {
   const router = useRouter()
+  const { login, isLoading: authLoading } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
@@ -80,23 +83,12 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
-      // In a real app, this would be an API call to your backend
-      // const response = await fetch('/api/auth/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email: formData.email, password: formData.password }),
-      // })
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      // For demo purposes, we'll just redirect to the dashboard
-      // In a real app, you would check the response and handle errors
+      await login(formData.email, formData.password);
       router.push("/dashboard")
     } catch (error) {
       setErrors((prev) => ({
         ...prev,
-        general: "An error occurred. Please try again.",
+        general: "Invalid email or password. Please try again.",
       }))
     } finally {
       setIsLoading(false)
@@ -160,6 +152,7 @@ export default function LoginPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  
                   Signing in...
                 </>
               ) : (

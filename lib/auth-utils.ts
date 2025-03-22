@@ -8,106 +8,149 @@ import type React from "react"
 
 import { useState, useEffect, createContext, useContext } from "react"
 
-type User = {
-  id: string
-  name: string
-  email: string
+// In a real application, this would connect to a backend/database
+// For demonstration purposes, we'll use localStorage
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  enrolledCourses: string[];
 }
 
-type AuthContextType = {
-  user: User | null
-  loading: boolean
-  login: (email: string, password: string) => Promise<void>
-  register: (name: string, email: string, password: string) => Promise<void>
-  logout: () => void
+export interface AuthState {
+  user: User | null;
+  isAuthenticated: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
-
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    // Check if user is logged in on mount
-    const storedUser = localStorage.getItem("user")
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
-    }
-    setLoading(false)
-  }, [])
-
-  const login = async (email: string, password: string) => {
-    setLoading(true)
-    try {
-      const response = await fetch("/api/auth", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || "Login failed")
-      }
-
-      const data = await response.json()
-
-      // Save user to local storage
-      localStorage.setItem("user", JSON.stringify(data.user))
-      localStorage.setItem("token", data.token)
-
-      setUser(data.user)
-    } catch (error) {
-      console.error("Login error:", error)
-      throw error
-    } finally {
-      setLoading(false)
-    }
+// Mock users for demonstration
+const mockUsers: User[] = [
+  {
+    id: '1',
+    name: 'John Doe',
+    email: 'john@example.com',
+    enrolledCourses: ['course-1', 'course-2']
+  },
+  {
+    id: '2',
+    name: 'Jane Smith',
+    email: 'jane@example.com',
+    enrolledCourses: ['course-3']
   }
+];
 
-  const register = async (name: string, email: string, password: string) => {
-    setLoading(true)
-    try {
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, password }),
-      })
+// Local storage keys
+const AUTH_KEY = 'webticode_auth';
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || "Registration failed")
-      }
-
-      const data = await response.json()
-      return data
-    } catch (error) {
-      console.error("Registration error:", error)
-      throw error
-    } finally {
-      setLoading(false)
-    }
+// Get initial auth state from localStorage
+export function getAuthState(): AuthState {
+  if (typeof window === 'undefined') {
+    return { user: null, isAuthenticated: false };
   }
-
-  const logout = () => {
-    localStorage.removeItem("user")
-    localStorage.removeItem("token")
-    setUser(null)
+  
+  const storedAuth = localStorage.getItem(AUTH_KEY);
+  if (!storedAuth) {
+    return { user: null, isAuthenticated: false };
   }
-
-  return <AuthContext.Provider value={{ user, loading, login, register, logout }}>{children}</AuthContext.Provider>
+  
+  try {
+    const authState = JSON.parse(storedAuth) as AuthState;
+    return authState;
+  } catch (error) {
+    console.error('Failed to parse auth state', error);
+    return { user: null, isAuthenticated: false };
+  }
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
+// Login function - in a real app this would call an API
+export async function login(email: string, password: string): Promise<AuthState> {
+  // Simulate API call
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Find user by email (in a real app, you would verify credentials)
+  const user = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+  
+  if (!user) {
+    throw new Error('Invalid email or password');
   }
-  return context
+  
+  const authState: AuthState = { user, isAuthenticated: true };
+  
+  // Save to localStorage
+  localStorage.setItem(AUTH_KEY, JSON.stringify(authState));
+  
+  return authState;
+}
+
+// Register function - in a real app this would call an API
+export async function register(name: string, email: string, password: string): Promise<AuthState> {
+  // Simulate API call
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Check if user already exists
+  if (mockUsers.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+    throw new Error('User with this email already exists');
+  }
+  
+  // Create new user
+  const newUser: User = {
+    id: `${mockUsers.length + 1}`,
+    name,
+    email,
+    enrolledCourses: []
+  };
+  
+  // In a real app, you would add the user to a database
+  mockUsers.push(newUser);
+  
+  const authState: AuthState = { user: newUser, isAuthenticated: true };
+  
+  // Save to localStorage
+  localStorage.setItem(AUTH_KEY, JSON.stringify(authState));
+  
+  return authState;
+}
+
+// Logout function
+export function logout(): void {
+  localStorage.removeItem(AUTH_KEY);
+}
+
+// Get user courses
+export function getUserCourses(userId: string): string[] {
+  const user = mockUsers.find(u => u.id === userId);
+  return user?.enrolledCourses || [];
+}
+
+// Enroll in a course
+export function enrollInCourse(userId: string, courseId: string): boolean {
+  const userIndex = mockUsers.findIndex(u => u.id === userId);
+  
+  if (userIndex === -1) {
+    return false;
+  }
+  
+  // Check if already enrolled
+  if (mockUsers[userIndex].enrolledCourses.includes(courseId)) {
+    return true;
+  }
+  
+  // Add course to user's enrolled courses
+  mockUsers[userIndex].enrolledCourses.push(courseId);
+  
+  // Update localStorage if this is the current user
+  const authState = getAuthState();
+  if (authState.user?.id === userId) {
+    authState.user = mockUsers[userIndex];
+    localStorage.setItem(AUTH_KEY, JSON.stringify(authState));
+  }
+  
+  return true;
+}
+
+// Check if a user is enrolled in a specific course
+export function isEnrolledInCourse(userId: string, courseId: string): boolean {
+  const user = mockUsers.find(u => u.id === userId);
+  return user?.enrolledCourses.includes(courseId) || false;
 }
 

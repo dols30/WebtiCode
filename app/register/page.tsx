@@ -11,9 +11,11 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Loader2 } from "lucide-react"
+import { useAuth } from "@/lib/auth-context"
 
 export default function RegisterPage() {
   const router = useRouter()
+  const { register } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
@@ -109,27 +111,12 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      // In a real app, this would be an API call to your backend
-      // const response = await fetch('/api/auth/register', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     name: formData.name,
-      //     email: formData.email,
-      //     password: formData.password
-      //   }),
-      // })
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-
-      // For demo purposes, we'll just redirect to the login page
-      // In a real app, you would check the response and handle errors
-      router.push("/login?registered=true")
-    } catch (error) {
+      await register(formData.name, formData.email, formData.password);
+      router.push("/dashboard")
+    } catch (error: any) {
       setErrors((prev) => ({
         ...prev,
-        general: "An error occurred. Please try again.",
+        general: error.message || "An error occurred during registration. Please try again.",
       }))
     } finally {
       setIsLoading(false)
@@ -154,7 +141,7 @@ export default function RegisterPage() {
                 id="name"
                 name="name"
                 type="text"
-                placeholder="John Doe"
+                placeholder="Dolraj Bashyal"
                 value={formData.name}
                 onChange={handleChange}
                 className={errors.name ? "border-red-500" : ""}

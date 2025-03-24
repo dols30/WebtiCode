@@ -31,6 +31,11 @@ export default function DashboardPage() {
       router.push("/login")
     }
   }, [isAuthenticated, isLoading, router])
+
+  // Handle tab change
+  const handleTabChange = (value: string) => {
+    setActiveTab(value)
+  }
   
   // Show loading state or return null while checking authentication
   if (isLoading || !isAuthenticated) {
@@ -64,45 +69,60 @@ export default function DashboardPage() {
           </Link>
         </div>
         <nav className="flex-1 p-4 space-y-1">
-          <Link href="/dashboard" className="flex items-center space-x-2 px-4 py-3 rounded-md bg-slate-800">
+          <button
+            onClick={() => handleTabChange("overview")}
+            className={`flex items-center space-x-2 px-4 py-3 rounded-md w-full ${
+              activeTab === "overview" ? "bg-slate-800" : "hover:bg-slate-800"
+            }`}
+          >
             <LayoutDashboard className="h-5 w-5" />
             <span>Dashboard</span>
-          </Link>
-          <Link
-            href="/dashboard/courses"
-            className="flex items-center space-x-2 px-4 py-3 rounded-md hover:bg-slate-800"
+          </button>
+          <button
+            onClick={() => handleTabChange("courses")}
+            className={`flex items-center space-x-2 px-4 py-3 rounded-md w-full ${
+              activeTab === "courses" ? "bg-slate-800" : "hover:bg-slate-800"
+            }`}
           >
             <BookOpen className="h-5 w-5" />
             <span>My Courses</span>
-          </Link>
-          <Link
-            href="/dashboard/schedule"
-            className="flex items-center space-x-2 px-4 py-3 rounded-md hover:bg-slate-800"
+          </button>
+          <button
+            onClick={() => handleTabChange("schedule")}
+            className={`flex items-center space-x-2 px-4 py-3 rounded-md w-full ${
+              activeTab === "schedule" ? "bg-slate-800" : "hover:bg-slate-800"
+            }`}
           >
             <Calendar className="h-5 w-5" />
             <span>Schedule</span>
-          </Link>
-          <Link
-            href="/dashboard/progress"
-            className="flex items-center space-x-2 px-4 py-3 rounded-md hover:bg-slate-800"
+          </button>
+          <button
+            onClick={() => handleTabChange("progress")}
+            className={`flex items-center space-x-2 px-4 py-3 rounded-md w-full ${
+              activeTab === "progress" ? "bg-slate-800" : "hover:bg-slate-800"
+            }`}
           >
             <BarChart className="h-5 w-5" />
             <span>Progress</span>
-          </Link>
-          <Link
-            href="/dashboard/profile"
-            className="flex items-center space-x-2 px-4 py-3 rounded-md hover:bg-slate-800"
+          </button>
+          <button
+            onClick={() => handleTabChange("profile")}
+            className={`flex items-center space-x-2 px-4 py-3 rounded-md w-full ${
+              activeTab === "profile" ? "bg-slate-800" : "hover:bg-slate-800"
+            }`}
           >
             <User className="h-5 w-5" />
             <span>Profile</span>
-          </Link>
-          <Link
-            href="/dashboard/settings"
-            className="flex items-center space-x-2 px-4 py-3 rounded-md hover:bg-slate-800"
+          </button>
+          <button
+            onClick={() => handleTabChange("settings")}
+            className={`flex items-center space-x-2 px-4 py-3 rounded-md w-full ${
+              activeTab === "settings" ? "bg-slate-800" : "hover:bg-slate-800"
+            }`}
           >
             <Settings className="h-5 w-5" />
             <span>Settings</span>
-          </Link>
+          </button>
         </nav>
         <div className="p-4 border-t border-slate-800">
           <Button variant="ghost" className="w-full justify-start text-white" onClick={handleLogout}>
@@ -136,7 +156,7 @@ export default function DashboardPage() {
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="h-5 w-5"
+                    className="h-5 w-5 text-slate-900"
                   >
                     <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
                     <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
@@ -155,7 +175,7 @@ export default function DashboardPage() {
                     alt="Avatar"
                   />
                 </Button>
-                <span className="font-medium">{user?.name}</span>
+                <span className="font-medium text-slate-900">{user?.name}</span>
               </div>
             </div>
           </div>
@@ -164,16 +184,17 @@ export default function DashboardPage() {
         {/* Dashboard Content */}
         <main className="p-4 md:p-6 space-y-6">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold">Welcome back, {user?.name}</h1>
+            <h1 className="text-2xl font-bold text-slate-900">Welcome back, {user?.name}</h1>
             <Button onClick={() => router.push('/courses')}>
               <GraduationCap className="mr-2 h-4 w-4" />
               Enroll in a Course
             </Button>
           </div>
 
-          <Tabs defaultValue="overview" className="space-y-4" onValueChange={setActiveTab}>
-            <TabsList>
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-4">
+            <TabsList className="bg-white">
               <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="courses">My Courses</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
               <TabsTrigger value="reports">Reports</TabsTrigger>
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
@@ -338,6 +359,55 @@ export default function DashboardPage() {
                   </CardContent>
                 </Card>
               </div>
+            </TabsContent>
+            <TabsContent value="courses" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>My Courses</CardTitle>
+                  <CardDescription>View and manage your enrolled courses</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {userCourses.length > 0 ? (
+                      userCourses.map(course => (
+                        <div key={course.id} className="flex items-center justify-between p-4 border rounded-lg">
+                          <div className="flex items-center space-x-4">
+                            <div className="h-12 w-12 rounded-lg bg-slate-100 flex items-center justify-center">
+                              <BookOpen className="h-6 w-6 text-slate-600" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-slate-900">{course.title}</h3>
+                              <p className="text-sm text-slate-600">{course.lessons} lessons • {course.duration}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium text-slate-900">{Math.floor(Math.random() * 50) + 50}%</p>
+                            <div className="mt-1 h-2 w-24 rounded-full bg-slate-200">
+                              <div 
+                                className={`h-full rounded-full ${
+                                  course.level === "Beginner" 
+                                    ? "bg-green-600" 
+                                    : course.level === "Intermediate" 
+                                      ? "bg-yellow-600" 
+                                      : "bg-blue-600"
+                                }`} 
+                                style={{ width: `${Math.floor(Math.random() * 50) + 50}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-slate-600 mb-4">You haven't enrolled in any courses yet.</p>
+                        <Button onClick={() => router.push('/courses')} variant="outline">
+                          Browse Courses
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
             <TabsContent value="analytics" className="space-y-4">
               <Card>

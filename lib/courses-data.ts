@@ -29,7 +29,7 @@ export const courses: Course[] = [
       name: 'Dolraj Bashyal',
       avatar: '/instructor-1.jpg',
     },
-    image: '/placeholder.jpg',
+    image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&auto=format&fit=crop&q=60',
     category: 'Frontend Development',
   },
   {
@@ -45,7 +45,7 @@ export const courses: Course[] = [
       name: 'Dolraj Bashyal',
       avatar: '/instructor-1.jpg',
     },
-    image: '/placeholder.jpg',
+    image: 'https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800&auto=format&fit=crop&q=60',
     category: 'Frontend Development',
   },
   {
@@ -61,7 +61,7 @@ export const courses: Course[] = [
       name: 'Dolraj Bashyal',
       avatar: '/instructor-1.jpg',
     },
-    image: '/placeholder.jpg',
+    image: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&auto=format&fit=crop&q=60',
     category: 'Frontend Development',
   },
   {
@@ -77,7 +77,7 @@ export const courses: Course[] = [
       name: 'Sarah Johnson',
       avatar: '/instructor-2.jpg',
     },
-    image: '/placeholder.jpg',
+    image: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&auto=format&fit=crop&q=60',
     category: 'UI/UX Design',
   },
   {
@@ -93,7 +93,7 @@ export const courses: Course[] = [
       name: 'Michael Chen',
       avatar: '/instructor-3.jpg',
     },
-    image: '/placeholder.jpg',
+    image: 'https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=800&auto=format&fit=crop&q=60',
     category: 'Backend Development',
   },
   {
@@ -109,7 +109,7 @@ export const courses: Course[] = [
       name: 'Multiple Instructors',
       avatar: '/instructor-1.jpg',
     },
-    image: '/placeholder.jpg',
+    image: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&auto=format&fit=crop&q=60',
     category: 'Full Stack',
   },
 ] as const; 

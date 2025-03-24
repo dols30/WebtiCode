@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { NewsletterForm } from "@/components/newsletter-form"
 
 export default function Home() {
   return (
@@ -42,14 +42,7 @@ export default function Home() {
           <div className="container">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <h2 className="text-2xl font-bold mb-4 md:mb-0">Sign Up For Our Newsletter</h2>
-              <div className="flex w-full md:w-auto">
-                <Input
-                  type="email"
-                  placeholder="Enter Email"
-                  className="rounded-r-none"
-                />
-                <Button className="rounded-l-none">Submit</Button>
-              </div>
+              <NewsletterForm />
             </div>
           </div>
         </section>
@@ -60,7 +53,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Virtual Option */}
               <div className="bg-slate-900 text-white rounded-lg overflow-hidden">
-                <div className="p-6 flex flex-col items-center text-center">
+                <div className="p-6 flex flex-col items-center text-center h-full">
                   <div className="mb-4 p-3 bg-slate-800 rounded-full">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -79,11 +72,11 @@ export default function Home() {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold mb-2">Virtual</h3>
-                  <p className="mb-6">
+                  <p className="mb-6 flex-grow">
                     Choose this option, if you want to learn all the fundamentals and advanced topics of frontend
                     development virtually...
                   </p>
-                  <Button variant="outline" className="mt-auto">
+                  <Button className="w-full bg-transparent border-2 border-white text-white hover:bg-white hover:text-slate-900 transition-colors">
                     Read More
                   </Button>
                 </div>
@@ -91,7 +84,7 @@ export default function Home() {
 
               {/* Hybrid Option */}
               <div className="bg-slate-600 text-white rounded-lg overflow-hidden">
-                <div className="p-6 flex flex-col items-center text-center">
+                <div className="p-6 flex flex-col items-center text-center h-full">
                   <div className="mb-4 p-3 bg-slate-700 rounded-full">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -110,11 +103,11 @@ export default function Home() {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold mb-2">Hybrid</h3>
-                  <p className="mb-6">
+                  <p className="mb-6 flex-grow">
                     If you want to learn frontend web development by the combination of both in-person and virtual
                     medium...
                   </p>
-                  <Button variant="outline" className="mt-auto">
+                  <Button className="w-full bg-transparent border-2 border-white text-white hover:bg-white hover:text-slate-600 transition-colors">
                     Read More
                   </Button>
                 </div>
@@ -122,7 +115,7 @@ export default function Home() {
 
               {/* In-Person Option */}
               <div className="bg-slate-900 text-white rounded-lg overflow-hidden">
-                <div className="p-6 flex flex-col items-center text-center">
+                <div className="p-6 flex flex-col items-center text-center h-full">
                   <div className="mb-4 p-3 bg-slate-800 rounded-full">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -143,11 +136,11 @@ export default function Home() {
                     </svg>
                   </div>
                   <h3 className="text-xl font-bold mb-2">In-Person</h3>
-                  <p className="mb-6">
+                  <p className="mb-6 flex-grow">
                     You can learn all the fundamentals and advanced topics of frontend development by joining our
                     in-person classes...
                   </p>
-                  <Button variant="outline" className="mt-auto">
+                  <Button className="w-full bg-transparent border-2 border-white text-white hover:bg-white hover:text-slate-900 transition-colors">
                     Read More
                   </Button>
                 </div>
@@ -163,13 +156,16 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Instructor 1 */}
               <div className="bg-slate-50 rounded-lg overflow-hidden shadow-md transition-transform hover:scale-105">
-                <Image
-                  src="/instructor-1.jpg"
-                  width={400}
-                  height={400}
-                  alt="Dolraj Bashyal"
-                  className="w-full h-64 object-cover"
-                />
+                <div className="relative w-full aspect-[4/3]">
+                  <Image
+                    src="/instructor-1.jpg"
+                    fill
+                    alt="Dolraj Bashyal"
+                    className="object-cover object-center"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority
+                  />
+                </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-2">Dolraj Bashyal</h3>
                   <p className="text-blue-600 mb-3">Frontend Developer & Lead Instructor</p>
@@ -196,13 +192,16 @@ export default function Home() {
 
               {/* Instructor 2 */}
               <div className="bg-slate-50 rounded-lg overflow-hidden shadow-md transition-transform hover:scale-105">
-                <Image
-                  src="/instructor-2.jpg"
-                  width={400}
-                  height={400}
-                  alt="Sarah Johnson"
-                  className="w-full h-64 object-cover"
-                />
+                <div className="relative w-full aspect-[4/3]">
+                  <Image
+                    src="/instructor-2.jpg"
+                    fill
+                    alt="Sarah Johnson"
+                    className="object-cover object-center"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority
+                  />
+                </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-2">Sarah Johnson</h3>
                   <p className="text-blue-600 mb-3">UX/UI Designer & Instructor</p>
@@ -229,13 +228,16 @@ export default function Home() {
 
               {/* Instructor 3 */}
               <div className="bg-slate-50 rounded-lg overflow-hidden shadow-md transition-transform hover:scale-105">
-                <Image
-                  src="/instructor-3.jpg"
-                  width={400}
-                  height={400}
-                  alt="Michael Chen"
-                  className="w-full h-64 object-cover"
-                />
+                <div className="relative w-full aspect-[4/3]">
+                  <Image
+                    src="/instructor-3.jpg"
+                    fill
+                    alt="Michael Chen"
+                    className="object-cover object-center"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority
+                  />
+                </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-2">Michael Chen</h3>
                   <p className="text-blue-600 mb-3">Backend Developer & Instructor</p>

@@ -65,7 +65,7 @@ export default function DashboardPage() {
       <aside className="hidden w-64 bg-slate-900 text-white md:flex flex-col">
         <div className="p-6">
           <Link href="/" className="flex items-center space-x-2 font-bold">
-            <span className="text-xl">WebDev Academy</span>
+            <span className="text-xl">WebtiCode</span>
           </Link>
         </div>
         <nav className="flex-1 p-4 space-y-1">

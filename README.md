@@ -1,3 +1,28 @@
+# WebtiCode Learning Platform
+
+A modern web development learning platform with course management, user dashboard, interactive UI, and content management.
+
+## Features
+
+- Course catalog with filtering capabilities
+- User authentication system
+- Interactive dashboard for enrolled courses
+- Responsive design for all devices
+- Modern UI with Tailwind CSS and shadcn/ui components
+- Theme customization with light and dark modes
+
+## Technologies Used
+
+- Next.js
+- TypeScript
+- Tailwind CSS
+- React
+- Shadcn UI
+
+## Deployment
+
+The application is deployed on Vercel at: https://webticode.vercel.app
+
 # WebtiCode - Web Development Learning Platform
 
 A modern web development learning platform built with Next.js, React, and Tailwind CSS.

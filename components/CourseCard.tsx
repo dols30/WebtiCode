@@ -21,8 +21,33 @@ export default function CourseCard({ course }: CourseCardProps) {
   const [isEnrollmentModalOpen, setIsEnrollmentModalOpen] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [enrollmentComplete, setEnrollmentComplete] = useState(false)
-  const { isAuthenticated, user, logout } = useAuth()
+  const { isAuthenticated, user, logout, addEnrolledCourse } = useAuth()
   const router = useRouter()
+
+  // Add payment form state
+  const [paymentDetails, setPaymentDetails] = useState({
+    cardName: "",
+    cardNumber: "",
+    expiry: "",
+    cvc: ""
+  })
+
+  // Handle payment form input changes
+  const handlePaymentInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target
+    setPaymentDetails(prev => ({
+      ...prev,
+      [id]: value
+    }))
+  }
+
+  // Add form validation
+  const isFormValid = () => {
+    return paymentDetails.cardName.trim() !== "" && 
+           paymentDetails.cardNumber.trim().length >= 16 &&
+           paymentDetails.expiry.trim().length >= 5 &&
+           paymentDetails.cvc.trim().length >= 3
+  }
 
   // Check if user is already enrolled
   const isEnrolled = user?.enrolledCourses?.includes(course.id) || false
@@ -36,17 +61,40 @@ export default function CourseCard({ course }: CourseCardProps) {
   }
 
   const handleCompleteEnrollment = () => {
+    if (!isFormValid()) {
+      alert("Please fill in all payment details correctly");
+      return;
+    }
+    
     setIsProcessing(true)
+    
+    // Simulate payment processing
     setTimeout(() => {
-      // Simulate enrollment - in a real app you would use an API call
-      // Update the user's enrolled courses in your auth context
-      setIsProcessing(false)
-      setEnrollmentComplete(true)
-      setTimeout(() => {
-        setIsEnrollmentModalOpen(false)
-        setEnrollmentComplete(false)
-        router.refresh() // Refresh the page to show updated enrollment status
-      }, 2000)
+      // Use the addEnrolledCourse function from the auth context
+      const success = addEnrolledCourse(course.id);
+      
+      if (success) {
+        setIsProcessing(false)
+        setEnrollmentComplete(true)
+        
+        setTimeout(() => {
+          setIsEnrollmentModalOpen(false)
+          setEnrollmentComplete(false)
+          // Reset payment form after successful enrollment
+          setPaymentDetails({
+            cardName: "",
+            cardNumber: "",
+            expiry: "",
+            cvc: ""
+          })
+          // We don't need a full page reload since the context updates the state
+          router.refresh() // Just refresh router data if needed
+        }, 2000)
+      } else {
+        // Handle enrollment failure
+        setIsProcessing(false)
+        alert("Enrollment failed. Please try again.")
+      }
     }, 1500)
   }
 
@@ -136,26 +184,60 @@ export default function CourseCard({ course }: CourseCardProps) {
             <>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="card">Payment method</Label>
-                  <Input id="card" value="**** **** **** 4242" readOnly />
+                  <Label htmlFor="cardName">Name on Card</Label>
+                  <Input 
+                    id="cardName" 
+                    placeholder="Dolraj"
+                    value={paymentDetails.cardName}
+                    onChange={handlePaymentInputChange}
+                    required
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="cardNumber">Card Number</Label>
+                  <Input 
+                    id="cardNumber" 
+                    placeholder="1234 5678 9012 3456"
+                    value={paymentDetails.cardNumber}
+                    onChange={handlePaymentInputChange}
+                    required
+                  />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="expire">Expires</Label>
-                    <Input id="expire" value="09/25" readOnly />
+                    <Label htmlFor="expiry">Expiration Date</Label>
+                    <Input 
+                      id="expiry" 
+                      placeholder="MM/YY"
+                      value={paymentDetails.expiry}
+                      onChange={handlePaymentInputChange}
+                      required
+                    />
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="cvc">CVC</Label>
-                    <Input id="cvc" value="***" readOnly />
+                    <Input 
+                      id="cvc" 
+                      placeholder="123"
+                      value={paymentDetails.cvc}
+                      onChange={handlePaymentInputChange}
+                      required
+                    />
                   </div>
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsEnrollmentModalOpen(false)}>Cancel</Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsEnrollmentModalOpen(false)}
+                  className="border-gray-300 hover:bg-gray-100"
+                >
+                  Cancel
+                </Button>
                 <Button 
                   onClick={handleCompleteEnrollment} 
-                  disabled={isProcessing}
-                  className="bg-primary text-white hover:bg-primary/90"
+                  disabled={isProcessing || !isFormValid()}
+                  className="bg-primary text-white hover:bg-primary/90 transition-colors"
                 >
                   {isProcessing ? (
                     <>
